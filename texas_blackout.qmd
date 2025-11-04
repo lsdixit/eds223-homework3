@@ -1,5 +1,227 @@
 ---
 title: "texas_blackout"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
+In early 2021, Texas experienced three extreme weather events resulting in a major power grid blackout. This blackout caused inhospitable conditions for many homes in Texas, with shortages of food, water, and heat. In this project, we will quantify the amount of homes in Houston that were affected by the outage, and investigate whether these impacts disproportionately affected certain census groups such as income. 
 
+```{r}
+# load packages
+library(tidyverse)
+library(dplyr)
+library(here)
+library(sf)
+library(stars)
+library(terra)
+library(raster)
+library(tmap)
+```
+
+```{r}
+# read in data
+query_road <- "SELECT * FROM gis_osm_roads_free_1 WHERE fclass='motorway'"
+roads <- st_read(here("data", "gis_osm_roads_free_1.gpkg"), query = query_road)
+
+query_houses <- "SELECT * FROM gis_osm_buildings_a_free_1 WHERE (type IS NULL AND name IS NULL) OR type in ('residential', 'apartments', 'house', 'static_caravan', 'detached')"
+houses <- st_read(here("data", "gis_osm_buildings_a_free_1.gpkg"), query = query_houses)
+
+st_layers(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"))
+socioeconomic_geoid <- st_read(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"), layer = "ACS_2019_5YR_TRACT_48_TEXAS")
+socioeconomic <- st_read(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"), layer = "X19_INCOME")
+
+light5_207 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021038.h08v05.001.2021039064328.tif"))
+light6_207<- read_stars(here("data", "VNP46A1", "VNP46A1.A2021038.h08v06.001.2021039064329.tif"))
+light5_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v05.001.2021048091106.tif"))
+light6_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v06.001.2021048091105.tif"))
+```
+
+Step 1: Find locations that experienced a blackout by creating a mask
+- a set of maps comparing night light intensities before and after the first two storms
+
+To identify places that experienced a blackout, you should create a “mask” that indicates for each cell whether or not it experienced a blackout.
+
+- find the change in night lights intensity (presumably) caused by the storm
+hint: this will require creating a raster object for each day (2021-02-07 and 2021-02-16)
+
+```{r}
+light_207 <- st_mosaic(light5_207, light6_207)
+light_216 <- st_mosaic(light5_216, light6_216)
+
+light_change <- light_207 - light_216
+```
+
+CROP HERE FOR HOUSTON TO GET A BETTER PLOT
+```{r}
+bbox_light <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_207))
+bbox_light <- st_as_sfc(bbox_light)
+bbox_light <- st_transform(bbox_light, st_crs(light_207))
+st_crs(bbox_light) == st_crs(light_207)
+cropped_light_207 <- st_crop(light_207, bbox_light)
+cropped_light_216 <- st_crop(light_216, bbox_light)
+
+map_207 <- tm_shape(cropped_light_207) +
+  tm_raster(palette = "Greys",
+            breaks = c(0, 100, 200, 500, 800, 1000, Inf),
+            title = "Night light intensity 
+(200 nW cm-2sr-1)")
+
+map_216 <- tm_shape(cropped_light_216) +
+  tm_raster(palette = "Greys",
+            breaks = c(0, 100, 200, 500, 800, 1000, Inf),
+            title = "Night light intensity 
+(200 nW cm-2sr-1)")
+
+tmap_arrange(map_207, map_216, nrow = 1)
+```
+
+- reclassify the difference raster, assuming that any location that experienced a drop of more than 200 nW cm-2sr-1 experienced a blackout. Assign any location with less than 200 nW cm-2sr-1 to NA.
+```{r}
+light_change <- rast(light_change)
+
+rcl <- matrix(c(-Inf, 200, NA,
+                200, Inf, TRUE),
+              ncol = 3, byrow = TRUE)
+
+reclass_light <- classify(light_change, rcl = rcl)
+reclass_light
+```
+
+- vectorize the blackout mask
+  hint: use st_as_sf() to convert from a raster to a vector and fix any invalid geometries with st_make_valid()
+```{r}
+st_crs(reclass_light)$epsg
+light_change_vector <- reclass_light %>% 
+  st_as_stars() %>% 
+  st_as_sf() %>% 
+  st_make_valid()
+class(light_change_vector)
+```
+  
+- crop (spatially subset) the blackout mask to the Houston area as defined by the following       coordinates: 
+  (-96.5, 29), (-96.5, 30.5), (-94.5, 30.5), (-94.5, 29)
+  
+bbox --> sf object
+```{r}
+bbox_crop <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_change_vector))
+bbox_crop <- st_as_sfc(bbox_crop)
+class(bbox_crop)
+bbox_crop <- st_transform(bbox_crop, st_crs(light_change_vector))
+
+st_crs(bbox_crop) == st_crs(light_change_vector)
+
+cropped_light_diff <- st_crop(light_change_vector, bbox_crop)
+```
+  
+- re-project the cropped blackout dataset to EPSG:3083 (NAD83 / Texas Centric Albers Equal Area)
+```{r}
+cropped_light_diff <- st_transform(cropped_light_diff, crs = "epsg:3083")
+st_crs(cropped_light_diff)$epsg
+```
+
+```{r}
+tm_shape(cropped_light_diff) +
+  tm_fill(fill = "black") +
+  tm_title("Areas of Houston experiencing a blackout")
+```
+
+Step 2: Exclude highways from analysis
+Highways may have experienced changes in their night light intensities that are unrelated to the storm. Therefore, you should excluded any locations within 200 meters of all highways in the Houston area.
+
+- identify areas within 200m of all highways
+  hint: you may need to use st_union
+```{r}
+st_crs(roads, parameters = TRUE)$units_gdal # its in degree units
+roads <- st_transform(roads, st_crs(cropped_light_diff))
+st_crs(roads, parameters = TRUE)$units_gdal # now it is in metre
+
+#roads <- st_union(roads)
+# create buffer of 200 m around roadways
+roads_200 <- st_buffer(roads, dist = 200)
+roads_200 <- st_union(roads_200)
+# plot quickly to check it worked
+tm_shape(roads) +
+  tm_lines() 
+tm_shape(roads_200) +
+  tm_lines()
+```
+  
+- find areas that experienced blackouts that are further than 200m from a highway
+```{r}
+# check CRS match
+st_crs(roads_200)$epsg == st_crs(cropped_light_diff)$epsg
+
+light_road_clip <- st_difference(cropped_light_diff, roads_200)
+
+tm_shape(light_road_clip) +
+  tm_polygons() +
+tm_shape(roads_200) +
+  tm_lines(col_alpha = 0.5, 
+           col = "red") +
+  tm_title("Homes that experienced a blackout in Houston, Texas") +
+  tm_title("200m away from highways", size = 0.9) +
+  tm_add_legend(type = "lines", 
+                labels = c("200m highway buffer"),
+                col = c("red")) +
+  tm_layout(legend.position = c("left", "bottom"))
+```
+
+Step 3: Identify homes that experienced blackouts by combining the locations of homes and blackouts
+
+```{r}
+# buildings + light road clip overlap (st_intersects, st_within, st_contains)
+st_crs(light_road_clip) == st_crs(houses)
+houses <- st_transform(houses, st_crs(light_road_clip))
+homes_blackout <- st_intersection(light_road_clip, houses)
+```
+
+- a map of the homes in Houston that lost power
+```{r}
+tm_shape(homes_blackout) +
+  tm_polygons()
+```
+
+- an estimate of the number of homes in Houston that lost power
+```{r}
+nrow(homes_blackout)
+```
+
+
+Step 4: Identify the census tracts likely impacted by blackout
+- identify homes that overlap with areas that experienced blackouts
+```{r}
+st_crs(socioeconomic_geoid)$epsg
+socioeconomic_geoid <- st_transform(socioeconomic_geoid, 
+                                    crs = st_crs(homes_blackout))
+
+socioeconomic_geoid <- st_make_valid(socioeconomic_geoid)
+
+socioeconomic <- socioeconomic %>% 
+  rename("GEOID_Data" = "GEOID")
+```
+
+```{r}
+socioeconomic_join <- left_join(socioeconomic_geoid, socioeconomic,
+                                by = "GEOID_Data")
+socioeconomic_join <- st_as_sf(socioeconomic_join)
+socioeconomic_join$B19013e1
+```
+
+```{r}
+socioeconomic_homes <- st_intersection(homes_blackout, socioeconomic_join)
+socioeconomic_no_blackout <- st_difference(homes_blackout, socioeconomic_join)
+```
+
+- a map of the census tracts in Houston that lost power
+```{r}
+tm_shape(socioeconomic_join$B19013e1) +
+  tm_raster()
+```
+
+- a plot comparing the distributions of median household income for census tracts that did and did not experience blackouts
+```{r}
+
+```
+
+Step 5: Conclusions
+- a brief reflection (approx. 100 words) summarizing your results and discussing any limitations to this study
