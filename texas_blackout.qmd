@@ -1,12 +1,16 @@
 ---
-title: "texas_blackout"
+title: "Quantifying the Texas blackout of 2021"
 format: html
 editor_options: 
   chunk_output_type: console
+author: Leela Dixit
+date: "November 10, 2025"
 ---
 In early 2021, Texas experienced three extreme weather events resulting in a major power grid blackout. This blackout caused inhospitable conditions for many homes in Texas, with shortages of food, water, and heat. In this project, we will quantify the amount of homes in Houston that were affected by the outage, and investigate whether these impacts disproportionately affected certain census groups such as income. 
 
 ```{r}
+#| output: false
+
 # load packages
 library(tidyverse)
 library(dplyr)
@@ -19,6 +23,8 @@ library(tmap)
 ```
 
 ```{r}
+#| output: false
+
 # read in data
 query_road <- "SELECT * FROM gis_osm_roads_free_1 WHERE fclass='motorway'"
 roads <- st_read(here("data", "gis_osm_roads_free_1.gpkg"), query = query_road)
@@ -36,8 +42,8 @@ light5_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v05.001.20
 light6_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v06.001.2021048091105.tif"))
 ```
 
-Step 1: Find locations that experienced a blackout by creating a mask
-
+# Step 1: Find locations that experienced a blackout by creating a mask
+Join the light data and find the change between dates
 ```{r}
 # join shapefiles of each tile for each day
 light_207 <- st_mosaic(light5_207, light6_207)
@@ -47,6 +53,7 @@ light_216 <- st_mosaic(light5_216, light6_216)
 light_change <- light_207 - light_216
 ```
 
+Visualize light intensity in Houston before and after the storm
 ```{r}
 # define bbox of Houston area
 bbox_light <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_207))
@@ -54,28 +61,43 @@ bbox_light <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs
 bbox_light <- st_as_sfc(bbox_light)
 # double check crs match before cropping
 st_crs(bbox_light) == st_crs(light_207)
+```
 
+```{r}
 # crop light intensities for each day to just Houston area
 cropped_light_207 <- st_crop(light_207, bbox_light)
 cropped_light_216 <- st_crop(light_216, bbox_light)
+```
+
+```{r}
+#| message: false
 
 # map each day to see the light change
 map_207 <- tm_shape(cropped_light_207) +
   tm_raster(palette = "Greys",
             breaks = c(0, 100, 200, 500, 800, 1000, Inf),
             title = "Night light intensity 
-(200 nW cm-2sr-1)")
-
+(200 nW cm-2sr-1)") +
+  tm_title("Light Intensity Pre-Storm") +
+  tm_compass() +
+  tm_scalebar()
+# 
 map_216 <- tm_shape(cropped_light_216) +
   tm_raster(palette = "Greys",
             breaks = c(0, 100, 200, 500, 800, 1000, Inf),
             title = "Night light intensity 
-(200 nW cm-2sr-1)")
+(200 nW cm-2sr-1)") +
+  tm_title("Light Intensity Post-Storm") +
+  tm_compass() +
+  tm_scalebar()
 
 tmap_arrange(map_207, map_216, nrow = 1)
 ```
 
+Create mask to define which areas experienced a blackout
 ```{r}
+#| output: false
+
 # transform from stars to raster object
 light_change <- rast(light_change)
 
@@ -89,6 +111,7 @@ reclass_light <- classify(light_change, rcl = rcl)
 reclass_light
 ```
 
+Transform light difference to a vector
 ```{r}
 # check crs of masked light dataframe
 st_crs(reclass_light)$epsg
@@ -102,12 +125,11 @@ light_change_vector <- reclass_light %>%
 # check type of vectorized data frame
 class(light_change_vector)
 ```
-  
-- crop (spatially subset) the blackout mask to the Houston area as defined by the following       coordinates: 
-  (-96.5, 29), (-96.5, 30.5), (-94.5, 30.5), (-94.5, 29)
-  
-bbox --> sf object
+
+crop (spatially subset) the blackout mask to the Houston area 
 ```{r}
+#| warning: false
+
 # redefine bbox for Houston area
 bbox_crop <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_change_vector))
 # transform bbox to sf object
@@ -121,21 +143,27 @@ st_crs(bbox_crop) == st_crs(light_change_vector)
 cropped_light_diff <- st_crop(light_change_vector, bbox_crop)
 ```
   
+Reproject the crs of the light change data 
 ```{r}
 # reproject vectorized data to NAD83 crs
 cropped_light_diff <- st_transform(cropped_light_diff, crs = "epsg:3083")
 st_crs(cropped_light_diff)$epsg
 ```
 
+Plot the areas of Houston that experienced a blackout
 ```{r}
 # plot Houston that experienced a blackout
 tm_shape(cropped_light_diff) +
   tm_fill(fill = "black") +
-  tm_title("Areas of Houston experiencing a blackout")
+  tm_basemap("CartoDB.PositronNoLabels") +
+  tm_title("Areas of Houston that experienced a blackout") +
+  tm_compass(position = tm_pos_in("left", "bottom")) +
+  tm_scalebar(position = tm_pos_in("left", "bottom"))
 ```
 
-Step 2: Exclude highways from analysis
+# Step 2: Exclude highways from analysis
 
+Find areas around highways to exclude from the analysis
 ```{r}
 # check units of roads and transform
 st_crs(roads, parameters = TRUE)$units_gdal # its in degree units
@@ -147,14 +175,20 @@ roads_200 <- st_buffer(roads, dist = 200)
 # join with roads to treat as one road 200m large
 roads_200 <- st_union(roads_200)
 # plot quickly to check it worked
-tm_shape(roads) +
-  tm_lines() 
-tm_shape(roads_200) +
-  tm_lines()
+map_road <- tm_shape(roads) +
+  tm_lines() +
+  tm_title("Before buffer")
+map_road_200 <- tm_shape(roads_200) +
+  tm_lines() +
+  tm_title("After buffer")
+tmap_arrange(map_road, map_road_200, nrow = 1)
 ```
   
-- find areas that experienced blackouts that are further than 200m from a highway
+find areas that experienced blackouts that are further than 200m from a highway
 ```{r}
+#| warning: false
+#| message: false
+
 # check CRS match
 st_crs(roads_200)$epsg == st_crs(cropped_light_diff)$epsg
 
@@ -175,9 +209,12 @@ tm_shape(roads_200) +
   tm_layout(legend.position = c("left", "bottom"))
 ```
 
-Step 3: Identify homes that experienced blackouts by combining the locations of homes and blackouts
+# Step 3: Identify homes that experienced blackouts by combining the locations of homes and blackouts
 
+Find homes that experienced a blackout
 ```{r}
+#| warning: false
+
 # check crs match
 st_crs(light_road_clip) == st_crs(houses) 
 # transform crs to match 
@@ -189,19 +226,26 @@ st_crs(light_road_clip) == st_crs(houses)
 homes_blackout <- st_intersection(light_road_clip, houses)
 ```
 
+Visualize homes that experienced a blackout
 ```{r}
 # plot homes in Houston that experienced a blackout
 tm_shape(homes_blackout) +
-  tm_polygons()
+  tm_polygons() +
+  tm_basemap("CartoDB.PositronNoLabels") +
+  tm_title("Homes that experienced a blackout in Houston, Texas")
+  tm_compass(position = tm_pos_in("left", "bottom")) +
+  tm_scalebar(position = tm_pos_in("left", "bottom"))
 ```
 
+Find the number of homes that experienced a blackout
 ```{r}
 # find number of homes that experienced a blackout
 nrow(homes_blackout)
 ```
 
-Step 4: Identify the census tracts likely impacted by blackout
-- identify homes that overlap with areas that experienced blackouts
+# Step 4: Identify the census tracts likely impacted by blackout
+
+Prepare socioeconomic data for joining
 ```{r}
 # check crs of socioeconomic data
 st_crs(socioeconomic_geoid)$epsg
@@ -213,7 +257,10 @@ socioeconomic <- socioeconomic %>%
   rename("GEOID_Data" = "GEOID")
 ```
 
+Join the spatial data with the socioeconomic data
 ```{r}
+#| output: false
+
 # join shapefile with socioeconomic data
 socioeconomic_join <- left_join(socioeconomic_geoid, socioeconomic,
                                 by = "GEOID_Data")
@@ -226,25 +273,68 @@ socioeconomic_join$B19013e1
 socioeconomic_join <- socioeconomic_join[, c("TRACTCE", "GEOID_Data", "B19013e1")]
 ```
 
+Find homes that did and did not experience a blackout
 ```{r}
+#| warning: false
+
 homes_blackout_TF <- houses %>% 
   mutate(blackout = osm_id %in% homes_blackout$osm_id)
 
 # join socioeconomic data to homes that experienced a blackout
 socioeconomic_homes <- st_intersection(homes_blackout_TF, socioeconomic_join)
+
+# socioeconomic_blackout_TF <- st_intersection(light_road_clip, socioeconomic_join)
+
 ```
 
-- a map of the census tracts in Houston that lost power
+map of the census tracts in Houston that lost power
 ```{r}
-tm_shape(socioeconomic_homes) +
-  tm_fill(fill = "TRACTCE")
+# filter census tracts that did and did not experience blackouts into different data frames
+socioeconomic_homes_blackout <- socioeconomic_homes %>% 
+  filter(blackout == "TRUE")
+
+socioeconomic_homes_no_blackout <- socioeconomic_homes %>% 
+  filter(blackout == "FALSE")
+
+# map each separately
+map_blackout <- tm_shape(socioeconomic_homes_blackout) +
+  tm_polygons(col = "B19013e1") +
+  tm_basemap("CartoDB.PositronNoLabels") +
+  tm_title("Cencus tracts that lost power") +
+  tm_layout(legend.show = FALSE) +
+  tm_compass(position = tm_pos_in("left", "bottom")) +
+  tm_scalebar(position = tm_pos_in("left", "bottom"))
+
+map_no_blackout <- tm_shape(socioeconomic_homes_no_blackout) +
+  tm_fill(col = "B19013e1") +
+  tm_basemap("CartoDB.PositronNoLabels") +
+  tm_title("Census tracts that did not lose power") +
+  tm_layout(legend.show = FALSE) +
+  tm_compass(position = tm_pos_in("left", "bottom")) +
+  tm_scalebar(position = tm_pos_in("left", "bottom"))
+
+map_blackout_legend <- tm_shape(socioeconomic_homes_blackout) +
+  tm_fill(fill = "B19013e1") +
+  tm_layout(legend.only = TRUE)
+
+tmap_arrange(map_blackout, map_no_blackout, map_blackout_legend, nrow = 1)
 ```
 
-- a plot comparing the distributions of median household income for census tracts that did and did not experience blackouts
+Compare the distributions of median household income for census tracts that did and did not experience blackouts
 ```{r}
-ggplot(socioeconomic_homes, aes(x = B19013e1)) +
-  geom_histogram() +
-  facet_wrap(~blackout)
+#| message: false
+#| warning: false
+
+# plot median household income by blackout or no blackout
+ggplot(socioeconomic_homes, aes(x = B19013e1, fill = blackout)) +
+  geom_histogram(position = "identity") +
+  labs(title = "Median Household Income by Blackout Experienced",
+       x = "Median household income",
+       y = "Count") +
+  theme_classic()
+
+ggplot(socioeconomic_homes, aes(x = B19013e1, fill = blackout)) +
+  geom_boxplot()
 ```
 
 Step 5: Conclusions
