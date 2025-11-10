@@ -30,17 +30,25 @@ library(tmap)
 query_road <- "SELECT * FROM gis_osm_roads_free_1 WHERE fclass='motorway'"
 roads <- st_read(here("data", "gis_osm_roads_free_1.gpkg"), query = query_road)
 
-query_houses <- "SELECT * FROM gis_osm_buildings_a_free_1 WHERE (type IS NULL AND name IS NULL) OR type in ('residential', 'apartments', 'house', 'static_caravan', 'detached')"
+query_houses <- "SELECT * FROM gis_osm_buildings_a_free_1 WHERE 
+(type IS NULL AND name IS NULL) OR type in ('residential', 
+'apartments', 'house', 'static_caravan', 'detached')"
 houses <- st_read(here("data", "gis_osm_buildings_a_free_1.gpkg"), query = query_houses)
 
 st_layers(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"))
-socioeconomic_geoid <- st_read(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"), layer = "ACS_2019_5YR_TRACT_48_TEXAS")
-socioeconomic <- st_read(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"), layer = "X19_INCOME")
+socioeconomic_geoid <- st_read(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"), 
+                               layer = "ACS_2019_5YR_TRACT_48_TEXAS")
+socioeconomic <- st_read(here("data", "ACS_2019_5YR_TRACT_48_TEXAS.gdb"), 
+                         layer = "X19_INCOME")
 
-light5_207 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021038.h08v05.001.2021039064328.tif"))
-light6_207<- read_stars(here("data", "VNP46A1", "VNP46A1.A2021038.h08v06.001.2021039064329.tif"))
-light5_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v05.001.2021048091106.tif"))
-light6_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v06.001.2021048091105.tif"))
+light5_207 <- read_stars(here("data", "VNP46A1", 
+                              "VNP46A1.A2021038.h08v05.001.2021039064328.tif"))
+light6_207<- read_stars(here("data", "VNP46A1", 
+                             "VNP46A1.A2021038.h08v06.001.2021039064329.tif"))
+light5_216 <- read_stars(here("data", "VNP46A1", 
+                              "VNP46A1.A2021047.h08v05.001.2021048091106.tif"))
+light6_216 <- read_stars(here("data", "VNP46A1", 
+                              "VNP46A1.A2021047.h08v06.001.2021048091105.tif"))
 ```
 
 # Step 1: Find locations that experienced a blackout by creating a mask
@@ -60,7 +68,8 @@ light_change <- light_207 - light_216
 
 ```{r}
 # define bbox of Houston area
-bbox_light <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_207))
+bbox_light <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), 
+                      crs = st_crs(light_207))
 # transform bbox into sf object
 bbox_light <- st_as_sfc(bbox_light)
 # double check crs match before cropping
@@ -138,7 +147,8 @@ class(light_change_vector)
 #| warning: false
 
 # redefine bbox for Houston area
-bbox_crop <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_change_vector))
+bbox_crop <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), 
+                     crs = st_crs(light_change_vector))
 # transform bbox to sf object
 bbox_crop <- st_as_sfc(bbox_crop)
 # double check class
@@ -150,7 +160,7 @@ st_crs(bbox_crop) == st_crs(light_change_vector)
 cropped_light_diff <- st_crop(light_change_vector, bbox_crop)
 ```
 
-### Reproject the crs of the light change data
+### Reproject the CRS of the light change data
 
 ```{r}
 # reproject vectorized data to NAD83 crs
@@ -303,14 +313,11 @@ homes_blackout_TF <- houses %>%
 
 # join socioeconomic data to homes that experienced a blackout
 socioeconomic_homes <- st_intersection(homes_blackout_TF, socioeconomic_join)
-
-# socioeconomic_blackout_TF <- st_intersection(light_road_clip, socioeconomic_join)
-
 ```
 
 ### Map of the census tracts in Houston that lost power
 
-```{r}
+```{r fig.width=8, fig.height=8}
 #| message: false
 
 # filter census tracts that did and did not experience blackouts into different data frames
@@ -328,23 +335,25 @@ map_blackout <- tm_shape(socioeconomic_homes_blackout) +
   tm_credits("Blackout",
              size = 1,
              position = c("LEFT", "TOP")) +
-  tm_layout(legend.show = FALSE) +
+  tm_layout(legend.show = FALSE,
+            asp = 1) +
   tm_compass(position = tm_pos_in("left", "bottom")) +
   tm_scalebar(position = tm_pos_in("left", "bottom"))
 
 map_no_blackout <- tm_shape(socioeconomic_homes_no_blackout) +
-  tm_fill(col = "B19013e1") +
+  tm_polygons(col = "B19013e1") +
   tm_basemap("CartoDB.PositronNoLabels") +
   tm_title("Census tracts in Houston, Texas") +
   tm_credits("No Blackout",
              size = 1,
              position = c("LEFT", "TOP")) +
-  tm_layout(legend.show = FALSE) +
+  tm_layout(legend.show = FALSE,
+            asp = 1) +
   tm_compass(position = tm_pos_in("left", "bottom")) +
   tm_scalebar(position = tm_pos_in("left", "bottom"))
 
 map_blackout_legend <- tm_shape(socioeconomic_homes_blackout) +
-  tm_fill(fill = "B19013e1",
+  tm_fill(col = "B19013e1",
           title = "Median Income") +
   tm_layout(legend.only = TRUE)
 
