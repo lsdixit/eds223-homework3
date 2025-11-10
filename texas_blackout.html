@@ -9,7 +9,7 @@
 <meta name="author" content="Leela Dixit">
 <meta name="dcterms.date" content="2025-11-10">
 
-<title>Quanitfying the Texas blackout of 2021</title>
+<title>Quantifying the Texas blackout of 2021</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Quanitfying the Texas blackout of 2021</h1>
+<h1 class="title">Quantifying the Texas blackout of 2021</h1>
 </div>
 
 
@@ -144,7 +144,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="step-1-find-locations-that-experienced-a-blackout-by-creating-a-mask" class="level1">
 <h1>Step 1: Find locations that experienced a blackout by creating a mask</h1>
-<p>Join the light data and find the change between dates</p>
+<section id="join-the-light-data-and-find-the-change-between-dates" class="level3">
+<h3 class="anchored" data-anchor-id="join-the-light-data-and-find-the-change-between-dates">Join the light data and find the change between dates</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># join shapefiles of each tile for each day</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>light_207 <span class="ot">&lt;-</span> <span class="fu">st_mosaic</span>(light5_207, light6_207)</span>
@@ -153,7 +154,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># find the change in light intensity before and after the storm</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>light_change <span class="ot">&lt;-</span> light_207 <span class="sc">-</span> light_216</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Visualize light intensity in Houston before and after the storm</p>
+</section>
+<section id="visualize-light-intensity-in-houston-before-and-after-the-storm" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-light-intensity-in-houston-before-and-after-the-storm">Visualize light intensity in Houston before and after the storm</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define bbox of Houston area</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>bbox_light <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(<span class="fu">c</span>(<span class="at">xmin =</span> <span class="sc">-</span><span class="fl">96.5</span>, <span class="at">ymin =</span> <span class="dv">29</span>, <span class="at">xmax =</span> <span class="sc">-</span><span class="fl">94.5</span>, <span class="at">ymax =</span> <span class="fl">30.5</span>), <span class="at">crs =</span> <span class="fu">st_crs</span>(light_207))</span>
@@ -175,8 +178,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>map_207 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(cropped_light_207) <span class="sc">+</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="at">palette =</span> <span class="st">"Greys"</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">500</span>, <span class="dv">800</span>, <span class="dv">1000</span>, <span class="cn">Inf</span>),</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">col.legend =</span> <span class="fu">tm_legend</span>(<span class="st">"Night light intensity </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">(200 nW cm-2sr-1)"</span>)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">title =</span> <span class="st">"Night light intensity </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">(200 nW cm-2sr-1)"</span>) <span class="sc">+</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_title</span>(<span class="st">"Light Intensity Pre-Storm"</span>) <span class="sc">+</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>() <span class="sc">+</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scalebar</span>()</span>
@@ -199,7 +202,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Create mask to define which areas experienced a blackout</p>
+</section>
+<section id="create-mask-to-define-which-areas-experienced-a-blackout" class="level3">
+<h3 class="anchored" data-anchor-id="create-mask-to-define-which-areas-experienced-a-blackout">Create mask to define which areas experienced a blackout</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform from stars to raster object</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>light_change <span class="ot">&lt;-</span> <span class="fu">rast</span>(light_change)</span>
@@ -213,7 +218,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>reclass_light <span class="ot">&lt;-</span> <span class="fu">classify</span>(light_change, <span class="at">rcl =</span> rcl)</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>reclass_light</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Transform light difference to a vector</p>
+</section>
+<section id="transform-light-difference-to-a-vector" class="level3">
+<h3 class="anchored" data-anchor-id="transform-light-difference-to-a-vector">Transform light difference to a vector</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check crs of masked light dataframe</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(reclass_light)<span class="sc">$</span>epsg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -232,7 +239,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] "sf"         "data.frame"</code></pre>
 </div>
 </div>
-<p>crop (spatially subset) the blackout mask to the Houston area</p>
+</section>
+<section id="crop-spatially-subset-the-blackout-mask-to-the-houston-area" class="level3">
+<h3 class="anchored" data-anchor-id="crop-spatially-subset-the-blackout-mask-to-the-houston-area">crop (spatially subset) the blackout mask to the Houston area</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># redefine bbox for Houston area</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>bbox_crop <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(<span class="fu">c</span>(<span class="at">xmin =</span> <span class="sc">-</span><span class="fl">96.5</span>, <span class="at">ymin =</span> <span class="dv">29</span>, <span class="at">xmax =</span> <span class="sc">-</span><span class="fl">94.5</span>, <span class="at">ymax =</span> <span class="fl">30.5</span>), <span class="at">crs =</span> <span class="fu">st_crs</span>(light_change_vector))</span>
@@ -251,7 +260,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># crop vectorized light object to just Houston area</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>cropped_light_diff <span class="ot">&lt;-</span> <span class="fu">st_crop</span>(light_change_vector, bbox_crop)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Reproject the crs of the light change data</p>
+</section>
+<section id="reproject-the-crs-of-the-light-change-data" class="level3">
+<h3 class="anchored" data-anchor-id="reproject-the-crs-of-the-light-change-data">Reproject the crs of the light change data</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># reproject vectorized data to NAD83 crs</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cropped_light_diff <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(cropped_light_diff, <span class="at">crs =</span> <span class="st">"epsg:3083"</span>)</span>
@@ -260,7 +271,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] 3083</code></pre>
 </div>
 </div>
-<p>Plot the areas of Houston that experienced a blackout</p>
+</section>
+<section id="plot-the-areas-of-houston-that-experienced-a-blackout" class="level3">
+<h3 class="anchored" data-anchor-id="plot-the-areas-of-houston-that-experienced-a-blackout">Plot the areas of Houston that experienced a blackout</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot Houston that experienced a blackout</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(cropped_light_diff) <span class="sc">+</span></span>
@@ -278,9 +291,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+</section>
 <section id="step-2-exclude-highways-from-analysis" class="level1">
 <h1>Step 2: Exclude highways from analysis</h1>
-<p>Find areas around highways to exclude from the analysis</p>
+<section id="find-areas-around-highways-to-exclude-from-the-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="find-areas-around-highways-to-exclude-from-the-analysis">Find areas around highways to exclude from the analysis</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check units of roads and transform</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(roads, <span class="at">parameters =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>units_gdal <span class="co"># its in degree units</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -312,7 +327,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>find areas that experienced blackouts that are further than 200m from a highway</p>
+</section>
+<section id="find-areas-that-experienced-blackouts-that-are-further-than-200m-from-a-highway" class="level3">
+<h3 class="anchored" data-anchor-id="find-areas-that-experienced-blackouts-that-are-further-than-200m-from-a-highway">Find areas that experienced blackouts that are further than 200m from a highway</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check CRS match</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(roads_200)<span class="sc">$</span>epsg <span class="sc">==</span> <span class="fu">st_crs</span>(cropped_light_diff)<span class="sc">$</span>epsg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -343,9 +360,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+</section>
 <section id="step-3-identify-homes-that-experienced-blackouts-by-combining-the-locations-of-homes-and-blackouts" class="level1">
 <h1>Step 3: Identify homes that experienced blackouts by combining the locations of homes and blackouts</h1>
-<p>Find homes that experienced a blackout</p>
+<section id="find-homes-that-experienced-a-blackout" class="level3">
+<h3 class="anchored" data-anchor-id="find-homes-that-experienced-a-blackout">Find homes that experienced a blackout</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check crs match</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(light_road_clip) <span class="sc">==</span> <span class="fu">st_crs</span>(houses) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -362,11 +381,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find homes that experienced a blackout</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>homes_blackout <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(light_road_clip, houses)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Visualize homes that experienced a blackout</p>
+</section>
+<section id="visualize-homes-that-experienced-a-blackout" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-homes-that-experienced-a-blackout">Visualize homes that experienced a blackout</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot homes in Houston that experienced a blackout</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(homes_blackout) <span class="sc">+</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>(<span class="st">"CartoDB.PositronNoLabels"</span>) <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_title</span>(<span class="st">"Homes that experienced a blackout in Houston, Texas"</span>) <span class="sc">+</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -375,81 +400,93 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Find the number of homes that experienced a blackout</p>
+</section>
+<section id="find-the-number-of-homes-that-experienced-a-blackout" class="level3">
+<h3 class="anchored" data-anchor-id="find-the-number-of-homes-that-experienced-a-blackout">Find the number of homes that experienced a blackout</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find number of homes that experienced a blackout</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(homes_blackout)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 168874</code></pre>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>n_homes <span class="ot">&lt;-</span> <span class="fu">nrow</span>(homes_blackout)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</div>
+<p>We can estimate that the number of homes that experienced a blackout was <strong>168874</strong>.</p>
+</section>
 </section>
 <section id="step-4-identify-the-census-tracts-likely-impacted-by-blackout" class="level1">
 <h1>Step 4: Identify the census tracts likely impacted by blackout</h1>
-<p>Prepare socioeconomic data for joining</p>
+<section id="prepare-socioeconomic-data-for-joining" class="level3">
+<h3 class="anchored" data-anchor-id="prepare-socioeconomic-data-for-joining">Prepare socioeconomic data for joining</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check crs of socioeconomic data</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(socioeconomic_geoid)<span class="sc">$</span>epsg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check crs of socioeconomic data</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(socioeconomic_geoid)<span class="sc">$</span>epsg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 4269</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform to match NAD83</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>socioeconomic_geoid <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(socioeconomic_geoid, </span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">crs =</span> <span class="fu">st_crs</span>(homes_blackout))</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># rename GEOID column to prep for joining</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>socioeconomic <span class="ot">&lt;-</span> socioeconomic <span class="sc">%&gt;%</span> </span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"GEOID_Data"</span> <span class="ot">=</span> <span class="st">"GEOID"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform to match NAD83</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>socioeconomic_geoid <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(socioeconomic_geoid, </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">crs =</span> <span class="fu">st_crs</span>(homes_blackout))</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co"># rename GEOID column to prep for joining</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>socioeconomic <span class="ot">&lt;-</span> socioeconomic <span class="sc">%&gt;%</span> </span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"GEOID_Data"</span> <span class="ot">=</span> <span class="st">"GEOID"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Join the spatial data with the socioeconomic data</p>
+</section>
+<section id="join-the-spatial-data-with-the-socioeconomic-data" class="level3">
+<h3 class="anchored" data-anchor-id="join-the-spatial-data-with-the-socioeconomic-data">Join the spatial data with the socioeconomic data</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># join shapefile with socioeconomic data</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>socioeconomic_join <span class="ot">&lt;-</span> <span class="fu">left_join</span>(socioeconomic_geoid, socioeconomic,</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">by =</span> <span class="st">"GEOID_Data"</span>)</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># transform to sf object</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>socioeconomic_join <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(socioeconomic_join)</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co"># check the column we want was populated with data</span></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>socioeconomic_join<span class="sc">$</span>B19013e1</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="co"># select for only the columns we want</span></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>socioeconomic_join <span class="ot">&lt;-</span> socioeconomic_join[, <span class="fu">c</span>(<span class="st">"TRACTCE"</span>, <span class="st">"GEOID_Data"</span>, <span class="st">"B19013e1"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># join shapefile with socioeconomic data</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>socioeconomic_join <span class="ot">&lt;-</span> <span class="fu">left_join</span>(socioeconomic_geoid, socioeconomic,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">by =</span> <span class="st">"GEOID_Data"</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># transform to sf object</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>socioeconomic_join <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(socioeconomic_join)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co"># check the column we want was populated with data</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>socioeconomic_join<span class="sc">$</span>B19013e1</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co"># select for only the columns we want</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>socioeconomic_join <span class="ot">&lt;-</span> socioeconomic_join[, <span class="fu">c</span>(<span class="st">"TRACTCE"</span>, <span class="st">"GEOID_Data"</span>, <span class="st">"B19013e1"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Find homes that did and did not experience a blackout</p>
+</section>
+<section id="find-homes-that-did-and-did-not-experience-a-blackout" class="level3">
+<h3 class="anchored" data-anchor-id="find-homes-that-did-and-did-not-experience-a-blackout">Find homes that did and did not experience a blackout</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>homes_blackout_TF <span class="ot">&lt;-</span> houses <span class="sc">%&gt;%</span> </span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">blackout =</span> osm_id <span class="sc">%in%</span> homes_blackout<span class="sc">$</span>osm_id)</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co"># join socioeconomic data to homes that experienced a blackout</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(homes_blackout_TF, socioeconomic_join)</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co"># socioeconomic_blackout_TF &lt;- st_intersection(light_road_clip, socioeconomic_join)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>homes_blackout_TF <span class="ot">&lt;-</span> houses <span class="sc">%&gt;%</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">blackout =</span> osm_id <span class="sc">%in%</span> homes_blackout<span class="sc">$</span>osm_id)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># join socioeconomic data to homes that experienced a blackout</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(homes_blackout_TF, socioeconomic_join)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># socioeconomic_blackout_TF &lt;- st_intersection(light_road_clip, socioeconomic_join)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>map of the census tracts in Houston that lost power</p>
+</section>
+<section id="map-of-the-census-tracts-in-houston-that-lost-power" class="level3">
+<h3 class="anchored" data-anchor-id="map-of-the-census-tracts-in-houston-that-lost-power">Map of the census tracts in Houston that lost power</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes_blackout <span class="ot">&lt;-</span> socioeconomic_homes <span class="sc">%&gt;%</span> </span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(blackout <span class="sc">==</span> <span class="st">"TRUE"</span>)</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes_blackout <span class="ot">&lt;-</span> socioeconomic_homes_blackout[, <span class="fu">c</span>(<span class="st">"blackout"</span>, <span class="st">"TRACTCE"</span>, <span class="st">"B19013e1"</span>)]</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes_blackout <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(socioeconomic_homes_blackout, <span class="st">"MULTIPOLYGON"</span>)</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes_no_blackout <span class="ot">&lt;-</span> socioeconomic_homes <span class="sc">%&gt;%</span> </span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(blackout <span class="sc">==</span> <span class="st">"FALSE"</span>)</span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>map_blackout <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(socioeconomic_homes_blackout) <span class="sc">+</span></span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>   <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"B19013e1"</span>) <span class="sc">+</span></span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>(<span class="st">"CartoDB.PositronNoLabels"</span>) <span class="sc">+</span></span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>map_no_blackout <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(socioeconomic_homes_no_blackout) <span class="sc">+</span></span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"B19013e1"</span>) <span class="sc">+</span></span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>(<span class="st">"CartoDB.PositronNoLabels"</span>) <span class="sc">+</span></span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a><span class="co"># tm_shape(socioeconomic_blackout_TF) +</span></span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a><span class="co">#   tm_polygons(fill = "B19013e1")</span></span>
-<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map_blackout, map_no_blackout, <span class="at">nrow =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter census tracts that did and did not experience blackouts into different data frames</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes_blackout <span class="ot">&lt;-</span> socioeconomic_homes <span class="sc">%&gt;%</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(blackout <span class="sc">==</span> <span class="st">"TRUE"</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>socioeconomic_homes_no_blackout <span class="ot">&lt;-</span> socioeconomic_homes <span class="sc">%&gt;%</span> </span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(blackout <span class="sc">==</span> <span class="st">"FALSE"</span>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="co"># map each separately</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>map_blackout <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(socioeconomic_homes_blackout) <span class="sc">+</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"B19013e1"</span>) <span class="sc">+</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>(<span class="st">"CartoDB.PositronNoLabels"</span>) <span class="sc">+</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_title</span>(<span class="st">"Cencus tracts that lost power"</span>) <span class="sc">+</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.show =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>map_no_blackout <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(socioeconomic_homes_no_blackout) <span class="sc">+</span></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"B19013e1"</span>) <span class="sc">+</span></span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>(<span class="st">"CartoDB.PositronNoLabels"</span>) <span class="sc">+</span></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_title</span>(<span class="st">"Census tracts that did not lose power"</span>) <span class="sc">+</span></span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.show =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">tm_pos_in</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>map_blackout_legend <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(socioeconomic_homes_blackout) <span class="sc">+</span></span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">fill =</span> <span class="st">"B19013e1"</span>) <span class="sc">+</span></span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map_blackout, map_no_blackout, map_blackout_legend, <span class="at">nrow =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -458,15 +495,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Compare the distributions of median household income for census tracts that did and did not experience blackouts</p>
+</section>
+<section id="compare-the-distributions-of-median-household-income-for-census-tracts-that-did-and-did-not-experience-blackouts" class="level3">
+<h3 class="anchored" data-anchor-id="compare-the-distributions-of-median-household-income-for-census-tracts-that-did-and-did-not-experience-blackouts">Compare the distributions of median household income for census tracts that did and did not experience blackouts</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot median household income by blackout or no blackout</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(socioeconomic_homes, <span class="fu">aes</span>(<span class="at">x =</span> B19013e1, <span class="at">fill =</span> blackout)) <span class="sc">+</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Household Income by Blackout Experienced"</span>,</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Median household income"</span>,</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot median household income by blackout or no blackout</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(socioeconomic_homes, <span class="fu">aes</span>(<span class="at">x =</span> B19013e1, <span class="at">fill =</span> blackout)) <span class="sc">+</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">col =</span> <span class="st">"black"</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Household Income by Blackout Experienced"</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Median household income"</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette=</span><span class="st">"Dark2"</span>)<span class="sc">+</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">"Dark2"</span>) <span class="sc">+</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"inside"</span>,</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position.inside =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.7</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -474,8 +517,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(socioeconomic_homes, <span class="fu">aes</span>(<span class="at">x =</span> B19013e1, <span class="at">fill =</span> blackout)) <span class="sc">+</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(socioeconomic_homes, <span class="fu">aes</span>(<span class="at">x =</span> B19013e1, <span class="at">fill =</span> blackout)) <span class="sc">+</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">"Dark2"</span>) <span class="sc">+</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Household Income by Blackout Experienced"</span>,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Median household income"</span>) <span class="sc">+</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"inside"</span>,</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position.inside =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -484,7 +533,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Step 5: Conclusions - a brief reflection (approx. 100 words) summarizing your results and discussing any limitations to this study</p>
+</section>
+</section>
+<section id="step-5-conclusions" class="level1">
+<h1>Step 5: Conclusions</h1>
+<p>We found around 160,000 homes in Houston were affected by the storms in 2021, experiencing a blackout during extreme weather events. The median household income for those affected was around 70,000, while those unaffected and did not experience a blackout was around 60,000. This analysis is a good start estimating what census groups might’ve been affected by the storms, but getting higher resolution for socioeconomic data (e.g each home instead of census tracts) would yield a stronger analysis. Additionally, clear spatial data of light intensity was limited due to cloud cover and the nature of the storm, so better spatial resolution of data could yield a more accurate and detailed understanding of which areas experienced a blackout.</p>
 </section>
 
 </main>

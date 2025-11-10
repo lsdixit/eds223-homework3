@@ -6,7 +6,8 @@ editor_options:
 author: Leela Dixit
 date: "November 10, 2025"
 ---
-In early 2021, Texas experienced three extreme weather events resulting in a major power grid blackout. This blackout caused inhospitable conditions for many homes in Texas, with shortages of food, water, and heat. In this project, we will quantify the amount of homes in Houston that were affected by the outage, and investigate whether these impacts disproportionately affected certain census groups such as income. 
+
+In early 2021, Texas experienced three extreme weather events resulting in a major power grid blackout. This blackout caused inhospitable conditions for many homes in Texas, with shortages of food, water, and heat. In this project, we will quantify the amount of homes in Houston that were affected by the outage, and investigate whether these impacts disproportionately affected certain census groups such as income.
 
 ```{r}
 #| output: false
@@ -43,7 +44,9 @@ light6_216 <- read_stars(here("data", "VNP46A1", "VNP46A1.A2021047.h08v06.001.20
 ```
 
 # Step 1: Find locations that experienced a blackout by creating a mask
-Join the light data and find the change between dates
+
+### Join the light data and find the change between dates
+
 ```{r}
 # join shapefiles of each tile for each day
 light_207 <- st_mosaic(light5_207, light6_207)
@@ -53,7 +56,8 @@ light_216 <- st_mosaic(light5_216, light6_216)
 light_change <- light_207 - light_216
 ```
 
-Visualize light intensity in Houston before and after the storm
+### Visualize light intensity in Houston before and after the storm
+
 ```{r}
 # define bbox of Houston area
 bbox_light <- st_bbox(c(xmin = -96.5, ymin = 29, xmax = -94.5, ymax = 30.5), crs = st_crs(light_207))
@@ -94,7 +98,8 @@ map_216 <- tm_shape(cropped_light_216) +
 tmap_arrange(map_207, map_216, nrow = 1)
 ```
 
-Create mask to define which areas experienced a blackout
+### Create mask to define which areas experienced a blackout
+
 ```{r}
 #| output: false
 
@@ -111,7 +116,8 @@ reclass_light <- classify(light_change, rcl = rcl)
 reclass_light
 ```
 
-Transform light difference to a vector
+### Transform light difference to a vector
+
 ```{r}
 # check crs of masked light dataframe
 st_crs(reclass_light)$epsg
@@ -126,7 +132,8 @@ light_change_vector <- reclass_light %>%
 class(light_change_vector)
 ```
 
-crop (spatially subset) the blackout mask to the Houston area 
+### Crop (spatially subset) the blackout mask to the Houston area
+
 ```{r}
 #| warning: false
 
@@ -142,15 +149,17 @@ st_crs(bbox_crop) == st_crs(light_change_vector)
 # crop vectorized light object to just Houston area
 cropped_light_diff <- st_crop(light_change_vector, bbox_crop)
 ```
-  
-Reproject the crs of the light change data 
+
+### Reproject the crs of the light change data
+
 ```{r}
 # reproject vectorized data to NAD83 crs
 cropped_light_diff <- st_transform(cropped_light_diff, crs = "epsg:3083")
 st_crs(cropped_light_diff)$epsg
 ```
 
-Plot the areas of Houston that experienced a blackout
+### Plot the areas of Houston that experienced a blackout
+
 ```{r}
 # plot Houston that experienced a blackout
 tm_shape(cropped_light_diff) +
@@ -163,7 +172,8 @@ tm_shape(cropped_light_diff) +
 
 # Step 2: Exclude highways from analysis
 
-Find areas around highways to exclude from the analysis
+### Find areas around highways to exclude from the analysis
+
 ```{r}
 # check units of roads and transform
 st_crs(roads, parameters = TRUE)$units_gdal # its in degree units
@@ -183,8 +193,9 @@ map_road_200 <- tm_shape(roads_200) +
   tm_title("After buffer")
 tmap_arrange(map_road, map_road_200, nrow = 1)
 ```
-  
-find areas that experienced blackouts that are further than 200m from a highway
+
+### Find areas that experienced blackouts that are further than 200m from a highway
+
 ```{r}
 #| warning: false
 #| message: false
@@ -211,7 +222,8 @@ tm_shape(roads_200) +
 
 # Step 3: Identify homes that experienced blackouts by combining the locations of homes and blackouts
 
-Find homes that experienced a blackout
+### Find homes that experienced a blackout
+
 ```{r}
 #| warning: false
 
@@ -226,26 +238,33 @@ st_crs(light_road_clip) == st_crs(houses)
 homes_blackout <- st_intersection(light_road_clip, houses)
 ```
 
-Visualize homes that experienced a blackout
+### Visualize homes that experienced a blackout
+
 ```{r}
+#| message: false
+
 # plot homes in Houston that experienced a blackout
 tm_shape(homes_blackout) +
   tm_polygons() +
   tm_basemap("CartoDB.PositronNoLabels") +
-  tm_title("Homes that experienced a blackout in Houston, Texas")
+  tm_title("Homes that experienced a blackout in Houston, Texas") +
   tm_compass(position = tm_pos_in("left", "bottom")) +
   tm_scalebar(position = tm_pos_in("left", "bottom"))
 ```
 
-Find the number of homes that experienced a blackout
+### Find the number of homes that experienced a blackout
+
 ```{r}
 # find number of homes that experienced a blackout
-nrow(homes_blackout)
+n_homes <- nrow(homes_blackout)
 ```
+
+We can estimate that the number of homes that experienced a blackout was **`r n_homes`**.
 
 # Step 4: Identify the census tracts likely impacted by blackout
 
-Prepare socioeconomic data for joining
+### Prepare socioeconomic data for joining
+
 ```{r}
 # check crs of socioeconomic data
 st_crs(socioeconomic_geoid)$epsg
@@ -257,7 +276,8 @@ socioeconomic <- socioeconomic %>%
   rename("GEOID_Data" = "GEOID")
 ```
 
-Join the spatial data with the socioeconomic data
+### Join the spatial data with the socioeconomic data
+
 ```{r}
 #| output: false
 
@@ -273,7 +293,8 @@ socioeconomic_join$B19013e1
 socioeconomic_join <- socioeconomic_join[, c("TRACTCE", "GEOID_Data", "B19013e1")]
 ```
 
-Find homes that did and did not experience a blackout
+### Find homes that did and did not experience a blackout
+
 ```{r}
 #| warning: false
 
@@ -287,8 +308,11 @@ socioeconomic_homes <- st_intersection(homes_blackout_TF, socioeconomic_join)
 
 ```
 
-map of the census tracts in Houston that lost power
+### Map of the census tracts in Houston that lost power
+
 ```{r}
+#| message: false
+
 # filter census tracts that did and did not experience blackouts into different data frames
 socioeconomic_homes_blackout <- socioeconomic_homes %>% 
   filter(blackout == "TRUE")
@@ -300,7 +324,10 @@ socioeconomic_homes_no_blackout <- socioeconomic_homes %>%
 map_blackout <- tm_shape(socioeconomic_homes_blackout) +
   tm_polygons(col = "B19013e1") +
   tm_basemap("CartoDB.PositronNoLabels") +
-  tm_title("Cencus tracts that lost power") +
+  tm_title("Census tracts in Houston, Texas") +
+  tm_credits("Blackout",
+             size = 1,
+             position = c("LEFT", "TOP")) +
   tm_layout(legend.show = FALSE) +
   tm_compass(position = tm_pos_in("left", "bottom")) +
   tm_scalebar(position = tm_pos_in("left", "bottom"))
@@ -308,34 +335,50 @@ map_blackout <- tm_shape(socioeconomic_homes_blackout) +
 map_no_blackout <- tm_shape(socioeconomic_homes_no_blackout) +
   tm_fill(col = "B19013e1") +
   tm_basemap("CartoDB.PositronNoLabels") +
-  tm_title("Census tracts that did not lose power") +
+  tm_title("Census tracts in Houston, Texas") +
+  tm_credits("No Blackout",
+             size = 1,
+             position = c("LEFT", "TOP")) +
   tm_layout(legend.show = FALSE) +
   tm_compass(position = tm_pos_in("left", "bottom")) +
   tm_scalebar(position = tm_pos_in("left", "bottom"))
 
 map_blackout_legend <- tm_shape(socioeconomic_homes_blackout) +
-  tm_fill(fill = "B19013e1") +
+  tm_fill(fill = "B19013e1",
+          title = "Median Income") +
   tm_layout(legend.only = TRUE)
 
 tmap_arrange(map_blackout, map_no_blackout, map_blackout_legend, nrow = 1)
 ```
 
-Compare the distributions of median household income for census tracts that did and did not experience blackouts
+### Compare the distributions of median household income for census tracts that did and did not experience blackouts
+
 ```{r}
 #| message: false
 #| warning: false
 
 # plot median household income by blackout or no blackout
 ggplot(socioeconomic_homes, aes(x = B19013e1, fill = blackout)) +
-  geom_histogram(position = "identity") +
+  geom_histogram(col = "black", position = "identity") +
   labs(title = "Median Household Income by Blackout Experienced",
        x = "Median household income",
        y = "Count") +
-  theme_classic()
+  scale_color_brewer(palette="Dark2")+
+  scale_fill_brewer(palette="Dark2") +
+  theme_classic() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.7))
 
 ggplot(socioeconomic_homes, aes(x = B19013e1, fill = blackout)) +
-  geom_boxplot()
+  geom_boxplot() +
+  scale_fill_brewer(palette="Dark2") +
+  labs(title = "Median Household Income by Blackout Experienced",
+       x = "Median household income") +
+  theme_classic() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.5))
 ```
 
-Step 5: Conclusions
-- a brief reflection (approx. 100 words) summarizing your results and discussing any limitations to this study
+# Step 5: Conclusions 
+
+We found around 160,000 homes in Houston were affected by the storms in 2021, experiencing a blackout during extreme weather events. The median household income for those affected was around 70,000, while those unaffected and did not experience a blackout was around 60,000. This analysis is a good start estimating what census groups might’ve been affected by the storms, but getting higher resolution for socioeconomic data (e.g each home instead of census tracts) would yield a stronger analysis. Additionally, clear spatial data of light intensity was limited due to cloud cover and the nature of the storm, so better spatial resolution of data could yield a more accurate and detailed understanding of which areas experienced a blackout.
