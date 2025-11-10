@@ -13,7 +13,7 @@ Data about light intensity was accessed through NASA's [Level-1 and Atmospheric 
 - [texas_blackout_files](https://github.com/lsdixit/eds223-homework3/tree/main/texas_blackout_files) : Folder for rendering html.
 - [texas_blackout.Rproj](https://github.com/lsdixit/eds223-homework3/blob/main/eds223-homework3.Rproj) : Project file.
 - [texas_blackout.html](https://github.com/lsdixit/eds223-homework3/blob/main/texas_blackout.html) : Rendered project as html page.
-- [figs]() : This folder contains all image outputs from the project.
+- [figs](https://github.com/lsdixit/eds223-homework3/tree/main/figs) : This folder contains all image outputs from the project.
 - data are not pushed to GitHub. If recreating this repository, this is the suggested data structure:
   - .gitignore
     - data
