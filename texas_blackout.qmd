@@ -391,3 +391,9 @@ ggplot(socioeconomic_homes, aes(x = B19013e1, fill = blackout)) +
 # Step 5: Conclusions 
 
 We found around 160,000 homes in Houston were affected by the storms in 2021, experiencing a blackout during extreme weather events. The median household income for those affected was around 70,000, while those unaffected and did not experience a blackout was around 60,000. This analysis is a good start estimating what census groups might’ve been affected by the storms, but getting higher resolution for socioeconomic data (e.g each home instead of census tracts) would yield a stronger analysis. Additionally, clear spatial data of light intensity was limited due to cloud cover and the nature of the storm, so better spatial resolution of data could yield a more accurate and detailed understanding of which areas experienced a blackout.
+
+### README Pictures
+[](\figs\README1.png)
+[](\figs\README2.png)
+
+
