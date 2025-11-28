@@ -42,3 +42,16 @@ Data about light intensity was accessed through NASA's [Level-1 and Atmospheric 
 
 # Author
 This work was done by Leela Dixit, with assistance from students in EDS223, Annie Adams, and Ale Vidal Meza. 
+
+# Citations
+LAADS DAAC. (November 24, 2025). Ladsweb.modaps.eosdis.nasa.gov. https://ladsweb.modaps.eosdis.nasa.gov/
+
+Planet OSM. (September 12, 2012). Planet.openstreetmap.org. https://planet.openstreetmap.org/
+
+Geofabrik Download Server. (n.d.). Download.geofabrik.de. https://download.geofabrik.de/
+
+US Census Bureau. (2021). American Community Survey (ACS). Census.gov. https://www.census.gov/programs-surveys/acs
+
+‌
+
+
