@@ -23,6 +23,22 @@ Data about light intensity was accessed through NASA's [Level-1 and Atmospheric 
         - census tract gdb files
       - VNP46A1
         - VIIRS data files
+```bash
+├── README.md
+├── texas_blackout.qmd
+├── texas_blackout_files
+├── texas_blackout.Rproj
+├── texas_blackout.html
+├── figs
+├── .gitignore
+│   ├── data
+│   │   ├── gis_osm_buildings_a_free_1.gpkg
+│   │   ├── gis_osm_roads_free_1.gpkg
+│   │   ├── ACS_2019_5YR_TRACT_48_TEXAS.gdb
+│   │   │   ├── census tract gdb files
+│   │   ├── VNP46A1
+│   │   │   ├── VIIRS data files
+```
 
 # Author
 This work was done by Leela Dixit, with assistance from students in EDS223, Annie Adams, and Ale Vidal Meza. 
